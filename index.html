@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+<!-- Jquery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script> 
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<!-- Angular JS-->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js"></script>
+
+<script>
+<!-- You can create multiple modules for a single page. A modules in Angular is no more than a "Container" for a section. For example you can create a modules for your menu and for your content.. and maybe even your footer -->
+<!-- my module is called myApp-->
+var app = angular.module('myApp',[]);
+
+<!-- Now we create a controller. Essentially a controller is a function that will be called later on. In this case its doing an ajax reqest to my php page that returns JSON-->
+<!-- from my understanding $scope is basically the return data while $http is needed to enable the ajax functions-->
+app.controller('customersCtrl', function($scope, $http) {
+    $http.get("http://localhost/angularjs/getData.php").success(function (response) {
+		<!-- return our scope using the name... "names"-->
+		$scope.names = response.records;});
+});
+<!-- seperate controller for our Menu section. This is a hard coded object-->
+app.controller('menuCtrl',function($scope){
+	$scope.links = [
+	{link:'http://google.com',name:'Google',target:'_blank'},
+	{link:'http://yahoo.com',name:'Yahoo',target:'_blank'},
+	{link:'http://bing.com',name:'Bing',target:'_blank'}
+	]
+});
+</script>
+</head>
+
+<body>
+<!-- We enable our module (myApp) on this div (remember its a container for our controllers. The controlers above will ONLY work inside the div that has ng-app="myApp"-->
+<div class="container" ng-app="myApp" >
+<div class="row">
+<div class="col-md-3">
+Menu
+<!--Run our menu controller -->	
+    <nav ng-controller="menuCtrl">
+    <ul>
+    <!-- By adding ng-repeat="x in links" this allows angular to automatically loop over our data without any server side code. Basically x is the index while links is the name of the object.-->
+    <li ng-repeat="x in links"><a href="{{x.link}}" target="{{x.target}}">{{x.name}}</a></li>
+    </ul>
+    </nav>
+
+</div>
+<div class="col-md-9">
+
+<!-- our controller that goes over the external ajax data-->
+<div ng-controller="customersCtrl">
+<!-- this part is cool... this allows automatic searching of the data magically. the name is called "namesearc" which will be used later to define what it is connected to-->
+<input type="text" value="" placeholder"Search Names...." ng-model="namesearch" class="form-control"/>
+
+<!-- Dont get to excited but... this is a loop with a filter (see above input) that AUTOMATICALLY orders by the name (which is what comes back in my data) HOW COOL IS THAT?!@?!@!?@!@?!-->
+<div class="row" ng-repeat="x in names | filter:namesearch | orderBy:'Name'">
+<div class="col-md-12">
+<!--remember boys and girls javascript starts at 0! thats why we add 1-->
+Record Number: {{$index+1}})<br/>
+Name: {{x.Name}}<br/>
+Phone: {{x.Phone}}<br/>
+Email: {{x.Email}}<br/>
+Address: {{x.Address}} {{x.City}}<br/>
+
+{{x.Story}}
+<hr/>
+</div>
+</div>
+
+<!--- commented out table before I switched to above code-->
+<!--<table class="table">
+
+<tr ng-repeat="x in names">
+<td>
+{{x.Name}}
+</td>
+<td>
+{{x.Phone}}
+</td>
+<td>
+{{x.Email}}
+</td>
+<td>
+{{x.Address}}
+</td>
+<td>
+{{x.City}}
+</td>
+<td>
+{{x.Country}}
+</td>
+</tr>
+</table>-->
+
+</div>
+
+</div>
+</div>
+</div>
+
+</body>
+</html>
